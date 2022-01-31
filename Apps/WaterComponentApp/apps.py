@@ -3,4 +3,4 @@ from django.apps import AppConfig
 
 class WatercomponentappConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'WaterComponentApp'
+    name = 'Apps.WaterComponentApp'

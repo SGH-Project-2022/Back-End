@@ -38,15 +38,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+    'rest_framework',
+    'corsheaders',
+
     # My Apps
-    'Apps.HardwareApp',
-    'Apps.GreenhouseApp',
-    'Apps.NotificationApp',
-    'Apps.PlantsApp',
-    'Apps.WaterComponentApp'
-    
-    
+    'Apps.UsersApp',
+    # 'Apps.HardwareApp',
+    # 'Apps.GreenhouseApp',
+    # 'Apps.NotificationApp',
+    # 'Apps.PlantsApp',
+    # 'Apps.WaterComponentApp',
+
+    # python manage.py startapp Your_App_Name ./apps/Your_Apps_Folder_Name/
+
 ]
 
 MIDDLEWARE = [
@@ -57,6 +61,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # For cors-header
+    'corsheaders.middleware.CorsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'SGHProject.urls'
@@ -89,11 +97,11 @@ WSGI_APPLICATION = 'SGHProject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME':'sgh_db',
+        'NAME': 'sgh_db',
         'USER': 'root',
-        'host':'localhost',
-        'PASSWORD':'',
-        'PORT':'3306',
+        'host': 'localhost',
+        'PASSWORD': '',
+        'PORT': '3306',
         'OPTIONS': {
             'read_default_file': '/path/to/my.cnf',
         },
@@ -137,9 +145,10 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-# Static Files Directories 
+# Static Files Directories
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'StaticFiles')
+    os.path.join(BASE_DIR, 'StaticFiles'),
+    os.path.join(BASE_DIR, 'Uploads'),
 ]
 
 
@@ -147,3 +156,11 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+AUTH_USER_MODEL = 'UsersApp.User'
+
+
+# For cors-header
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True

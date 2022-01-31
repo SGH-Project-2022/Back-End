@@ -18,14 +18,14 @@ application = get_wsgi_application()
 # For Socket.io Settings
 
 
-from Hardware.views import sio
-import socketio
+# from Hardware.views import sio
+# import socketio
 
-application = socketio.WSGIApp(sio, application)
+# application = socketio.WSGIApp(sio, application)
 
-import eventlet
-import eventlet.wsgi
+# import eventlet
+# import eventlet.wsgi
 
-eventlet.wsgi.server(eventlet.listen(('', 8000)), application)
+# eventlet.wsgi.server(eventlet.listen(('', 8000)), application)
 
 
