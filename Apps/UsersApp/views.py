@@ -1,20 +1,19 @@
 from rest_framework.views import APIView
-from rest_framework.response import Response
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
-
-from .serializers import UserSerializer
-from .models import User
-
-from Library import jwt_token
+from .serializers import UserSerializer, UserLoginSerializer , UserLogoutSerializer
 from Library.api_response import ApiResponse
+from rest_framework import status 
 
 # Create your views here.
+
 api_response = ApiResponse()
-# https://www.youtube.com/watch?v=Wq6JqXqOzCE
+
 
 
 class RegisterView(APIView):
-    permission_classes = [IsAuthenticated]
+
+    permission_classes = [AllowAny]
 
     def post(self, request):
         api_response.__init__()
@@ -22,80 +21,55 @@ class RegisterView(APIView):
         serializer = UserSerializer(data=request.data)
 
         if not serializer.is_valid():
-            return api_response.set_status_code(400).set_data("errors", serializer.errors).reponse()
+            return api_response.set_status_code(status.HTTP_400_BAD_REQUEST).set_data("errors", serializer.errors).response()
 
         user = serializer.save()
 
-        token = jwt_token.generate_JWT_token(user)
-
-        return api_response.set_status_code(code=200).set_data(
-            "user", serializer.data).set_token(token).reponse()
+        login_serializer =  UserLoginSerializer(data = request.data)
+        
+        if not login_serializer.is_valid():
+            user.delete()
+            return api_response.set_status_code(status.HTTP_501_NOT_IMPLEMENTED).set_data("message","Unexpected error please try again later").response()
+        
+        user , refresh , token = login_serializer.login()
+        
+        return api_response.set_status_code(status.HTTP_200_OK).set_data( "user",user).set_data("refresh",refresh).set_token(token).response()
 
 
 class LoginView(APIView):
+
     permission_classes = [AllowAny]
 
     def post(self, request):
-
         api_response.__init__()
 
-        email = request.data['email']
-        password = request.data['password']
+        serializer = UserLoginSerializer(data = request.data)
+        
+        if not serializer.is_valid():
+            return api_response.set_status_code(status.HTTP_400_BAD_REQUEST).set_data("errors", serializer.errors).response()
 
-        user = User.get_user_by_email(email=email)
+        user , refresh , token = serializer.login()
 
-        if user is None:
-            return api_response.set_status_code(401).set_data("message", "User not found !").reponse()
-
-        if not user.check_password(password):
-            return api_response.set_status_code(401).set_data("message", "Incorrect password !").reponse()
-
-        token = jwt_token.generate_JWT_token(user)
-
-        response = api_response.set_status_code(code=200).set_data(
-            "user", UserSerializer(user).data).set_token(token).reponse()
-
-        response.set_cookie(key='user-token', value=token, httponly=True)
-
-        return response
-
-
-# class UserView(APIView):
-#     def get(self, request):
-#         token = request.COOKIES.get('jwt')
-
-#         if not token:
-#             raise AuthenticationFailed('Unauthenticated!')
-
-#         try:
-#             payload = jwt.decode(token, 'secret', algorithm=['HS256'])
-#         except jwt.ExpiredSignatureError:
-#             raise AuthenticationFailed('Unauthenticated!')
-
-#         user = User.objects.filter(id=payload['id']).first()
-#         serializer = UserSerializer(user)
-#         return Response(serializer.data)
+        return api_response.set_status_code(status.HTTP_200_OK).set_data( "user", user).set_data("refresh",refresh).set_token(token).response()
 
 
 class LogoutView(APIView):
+
     permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]   
+    
+    def get(self, request):        
+        api_response.__init__()
+        
+        serializer = UserLogoutSerializer(data = request.data)
+        
+        if not serializer.is_valid():
+            return api_response.set_status_code(status.HTTP_400_BAD_REQUEST).set_data("errors", serializer.errors).response()
 
-    # def _check_loggedin(request):
-    #     token = request.COOKIES.get('user-token')
+        serializer.save()
+        
+        
+        return api_response.set_status_code(status.HTTP_200_OK).set_data("message", "Logged out successfully").response()
 
-    #     if not token:
-    #         raise AuthenticationFailed('Unauthenticated!')
 
-    #     try:
-    #         payload = jwt.decode(token, 'secret', algorithm=['HS256'])
-    #     except jwt.ExpiredSignatureError:
-    #         raise AuthenticationFailed('Unauthenticated!')
 
-    def post(self, request):
-
-        response = Response()
-        response.delete_cookie('jwt')
-        response.data = {
-            'message': 'success'
-        }
-        return

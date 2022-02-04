@@ -1,0 +1,15 @@
+dnspython
+enum-compat
+eventlet
+greenlet
+monotonic
+python-engineio
+python-socketio
+pytz
+six
+mysqlclient
+djangorestframework
+pyJWT
+djangorestframework-simplejwt
+django-phonenumber-field[phonenumbers]
+django-countries

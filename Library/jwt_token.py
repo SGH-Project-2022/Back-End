@@ -7,9 +7,10 @@ def generate_JWT_token(object) -> str:
     payload = {
         'id': object.id,
         'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
-        'iat': datetime.datetime.utcnow()
+        'iat': datetime.datetime.utcnow(),
     }
-    token = jwt.encode(payload, 'secret', algorithm='HS256')
+    token = jwt.encode(payload, 'secret', algorithm='HS256',
+                       headers={'AUTH_HEADER_TYPES': ('Bearer',)})
     return token
 
 

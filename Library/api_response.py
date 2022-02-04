@@ -1,5 +1,3 @@
-from urllib import response
-from django.template import Library
 from rest_framework.response import Response
 
 
@@ -19,5 +17,8 @@ class ApiResponse:
         self.__reponse["token"] = token
         return self
 
-    def reponse(self) -> Response:
+    def response(self) -> Response:
         return Response(self.__reponse)
+
+    def get(self) -> dict:
+        return self.__reponse

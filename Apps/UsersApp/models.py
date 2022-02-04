@@ -1,30 +1,30 @@
+from distutils.command.upload import upload
+from email.policy import default
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from phonenumber_field.modelfields import PhoneNumberField
+from django_countries.fields import CountryField
 
 # Create your models here.
 
 
-class User(AbstractUser):
+class User(AbstractUser ):
     name = models.CharField(max_length=255)
 
-    email = models.CharField(max_length=255, unique=True)
+    email = models.EmailField(max_length=255, unique=True)
     password = models.CharField(max_length=255)
 
-    phone = models.CharField(max_length=255, unique=True)
+    phone = PhoneNumberField(null=False, blank=False, unique=True)
 
-    image = models.CharField(max_length=255, null=True)
+    image = models.ImageField(blank=False ,  null=True, upload_to="UsersUploads/" , default = 'UsersUploads/defaultUserImage.png')
 
-    country = models.CharField(max_length=255)
-
-    created_at = models.DateTimeField(auto_now_add=True)
+    country = CountryField()
 
     username = None
     first_name = None
     last_name = None
-    is_staff = None
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
-    def get_user_by_email(email: str):
-        return User.objects.filter(email=email).first()
+    

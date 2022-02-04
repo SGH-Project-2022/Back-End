@@ -10,8 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 import os
+from datetime import timedelta
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -38,9 +40,20 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
-    'corsheaders',
+    
+    'phonenumber_field',
 
+    
+    # For API's
+    'rest_framework',
+    
+    # For Authentication
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
+    
+    # For Allow CORS
+    'corsheaders',
+    
     # My Apps
     'Apps.UsersApp',
     # 'Apps.HardwareApp',
@@ -49,9 +62,9 @@ INSTALLED_APPS = [
     # 'Apps.PlantsApp',
     # 'Apps.WaterComponentApp',
 
-    # python manage.py startapp Your_App_Name ./apps/Your_Apps_Folder_Name/
-
 ]
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -148,8 +161,14 @@ STATIC_URL = 'static/'
 # Static Files Directories
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'StaticFiles'),
-    os.path.join(BASE_DIR, 'Uploads'),
 ]
+
+
+
+# For Media
+MEDIA_URL = 'uploads/'
+MEDIA_ROOT = os.path.join(BASE_DIR , 'Uploads')
+
 
 
 # Default primary key field type
@@ -158,18 +177,44 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-AUTH_USER_MODEL = 'UsersApp.User'
-
-
 # For cors-header
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
 
-# For API Auth
+# For Auth
+
+AUTH_USER_MODEL = 'UsersApp.User'
+
+
 REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
         'rest_framework.permissions.IsAuthenticated',
-    ]
+    ],
+    
+    "EXCEPTION_HANDLER": "Library.handler.custom_exception_handler"
+
 }
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': False,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'UPDATE_LAST_LOGIN': True,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+    'TOKEN_USER_CLASS': 'rest_framework_simplejwt.models.TokenUser',
+}
+
+# For Countries
+
+COUNTRIES_ONLY = ['EG']
