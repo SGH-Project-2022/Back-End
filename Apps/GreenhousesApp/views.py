@@ -1,5 +1,5 @@
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated , AllowAny
 from Library.permissions import HasGreenhouse
 from Apps.GreenhousesApp.models import Greenhouse
 from .serializers import GreenhouseSerializers, ConfigureGreenhouseSerializer, GetUserGreenhouseSerializer 
@@ -28,7 +28,7 @@ class ConfigureGreenhouseView(APIView):
 
 
 class GetUserGreenhousesView(APIView):
-    permission_class = [ IsAuthenticated & HasGreenhouse]
+    permission_class = [ IsAuthenticated &  HasGreenhouse ]
 
     def get(self, request , id = None):
         

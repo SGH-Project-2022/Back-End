@@ -34,6 +34,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+        
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -56,10 +57,10 @@ INSTALLED_APPS = [
     # My Apps
     'Apps.UsersApp',
     'Apps.GreenhousesApp',
+    'Apps.PlantsApp',
+    'Apps.WaterComponentApp',
     # 'Apps.HardwareApp',
     # 'Apps.NotificationApp',
-    # 'Apps.PlantsApp',
-    # 'Apps.WaterComponentApp',
 
 ]
 
@@ -76,7 +77,6 @@ MIDDLEWARE = [
 
     # For cors-header
     'corsheaders.middleware.CorsMiddleware',
-
 ]
 
 ROOT_URLCONF = 'SGHProject.urls'
@@ -179,7 +179,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # For cors-header
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = True
+ALLOWED_HOSTS=['*']
 
+from corsheaders.defaults import default_headers
+
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    "Authorization",
+    
+]
 
 # For Auth
 
@@ -218,3 +226,8 @@ SIMPLE_JWT = {
 # For Countries
 
 COUNTRIES_ONLY = ['EG']
+
+
+
+
+
