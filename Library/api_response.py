@@ -1,5 +1,5 @@
 from rest_framework.response import Response
-
+from rest_framework import status
 
 class ApiResponse:
     def __init__(self):
@@ -22,3 +22,9 @@ class ApiResponse:
 
     def get(self) -> dict:
         return self.__reponse
+    
+    def success_response(self , message) -> Response:
+        self.__init__()
+        self.__reponse['status_code'] = status.HTTP_200_OK
+        self.__reponse['message'] = message
+        return Response(self.__reponse)

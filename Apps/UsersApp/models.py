@@ -1,5 +1,3 @@
-from distutils.command.upload import upload
-from email.policy import default
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from phonenumber_field.modelfields import PhoneNumberField
@@ -16,7 +14,7 @@ class User(AbstractUser ):
 
     phone = PhoneNumberField(null=False, blank=False, unique=True)
 
-    image = models.ImageField(blank=False ,  null=True, upload_to="UsersUploads/" , default = 'UsersUploads/defaultUserImage.png')
+    image = models.ImageField( upload_to="UsersUploads/" , default = 'UsersUploads/defaultUserImage.png')
 
     country = CountryField()
 

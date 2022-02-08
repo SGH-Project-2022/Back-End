@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
     'phonenumber_field',
 
     
@@ -56,8 +55,8 @@ INSTALLED_APPS = [
     
     # My Apps
     'Apps.UsersApp',
+    'Apps.GreenhousesApp',
     # 'Apps.HardwareApp',
-    # 'Apps.GreenhouseApp',
     # 'Apps.NotificationApp',
     # 'Apps.PlantsApp',
     # 'Apps.WaterComponentApp',
@@ -194,6 +193,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
         'rest_framework.permissions.IsAuthenticated',
+        'Library.permissions.HasGreenhouse',
     ],
     
     "EXCEPTION_HANDLER": "Library.handler.custom_exception_handler"

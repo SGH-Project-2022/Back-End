@@ -13,3 +13,4 @@ pyJWT
 djangorestframework-simplejwt
 django-phonenumber-field[phonenumbers]
 django-countries
+django-cities
