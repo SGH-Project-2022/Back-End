@@ -3,9 +3,10 @@ from rest_framework import serializers
 from Library.api_response import ApiResponse
 from rest_framework import status
 from django_countries.serializers import CountryFieldMixin
-
+from Apps.PlantsApp.serializers import PlantsSerializer
 
 class GreenhouseSerializers(CountryFieldMixin , serializers.ModelSerializer):
+    plants = PlantsSerializer(many=True)
     class Meta:
         model = Greenhouse
         fields = "__all__"
@@ -72,8 +73,8 @@ class GetUserGreenhouseSerializer(serializers.Serializer):
         if self.context["id"] is not None:
             
             try:
-                Greenhouse.objects.filter( pk=self.context["id"], user=self.context["request"].user , is_active = True)
-            
+                Greenhouse.objects.get( pk=self.context["id"], user=self.context["request"].user , is_active = True)
+
             except Greenhouse.DoesNotExist:
                 response = api_response.set_status_code(status.HTTP_404_NOT_FOUND).set_data("errors", "This greenhouse not found").get()
                 raise serializers.ValidationError(detail=response)
@@ -83,5 +84,9 @@ class GetUserGreenhouseSerializer(serializers.Serializer):
     
     def save(self , **kwargs):
         greenhouse = Greenhouse.objects.filter(user=self.context["request"].user , is_active = True)
+        
+        if self.context["id"] is not None:
+            greenhouse = Greenhouse.objects.filter( pk=self.context["id"], user=self.context["request"].user , is_active = True)
+            
         return greenhouse
 

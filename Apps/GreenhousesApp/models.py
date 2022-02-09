@@ -1,6 +1,7 @@
 from django.db import models
 from django_countries.fields import CountryField
 from django.utils.crypto import get_random_string
+from numpy import require
 from Apps.UsersApp.models import User
 from Apps.PlantsApp.models import Plant
 # Create your models here.
@@ -34,7 +35,7 @@ class Greenhouse(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     
-    plants = models.ManyToManyField(Plant , related_name="greenhouse_plant" )
+    plants = models.ManyToManyField(Plant , related_name="greenhouse_plant"  , null=True , blank=False)
     
     def __str__(self):
         return str(self.id)

@@ -58,7 +58,7 @@ INSTALLED_APPS = [
     'Apps.UsersApp',
     'Apps.GreenhousesApp',
     'Apps.PlantsApp',
-    'Apps.WaterComponentApp',
+    # 'Apps.WaterComponentApp',
     # 'Apps.HardwareApp',
     # 'Apps.NotificationApp',
 
@@ -186,7 +186,7 @@ from corsheaders.defaults import default_headers
 
 CORS_ALLOW_HEADERS = list(default_headers) + [
     "Authorization",
-    
+
 ]
 
 # For Auth
@@ -200,8 +200,6 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
-        'rest_framework.permissions.IsAuthenticated',
-        'Library.permissions.HasGreenhouse',
     ],
     
     "EXCEPTION_HANDLER": "Library.handler.custom_exception_handler"
