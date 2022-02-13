@@ -58,8 +58,9 @@ INSTALLED_APPS = [
     'Apps.UsersApp',
     'Apps.GreenhousesApp',
     'Apps.PlantsApp',
+    'Apps.HardwareApp',
+
     # 'Apps.WaterComponentApp',
-    # 'Apps.HardwareApp',
     # 'Apps.NotificationApp',
 
 ]

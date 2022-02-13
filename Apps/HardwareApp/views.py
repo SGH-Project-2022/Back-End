@@ -1,45 +1,32 @@
-from concurrent.futures import thread
-from django.db import DatabaseError
-from django.shortcuts import render
-import os
-from django.http import HttpResponse
-import socketio
-from django.contrib.auth.models import User
+from itsdangerous import Serializer
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from Library.permissions import HasGreenhouse
+from .serializers import SensorValuesSerializer
+
+# Input
+
+# id	value	greenhouse_id	sensor_id
+
+class SensorsValuesView(APIView):
+    # permission_classes = [HasGreenhouse & IsAuthenticated]
+    def post(self , request):
+        serializer = SensorValuesSerializer(data = request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors)
+        
+        
+        return Response(True)
 
 
 
-async_mode = None
-
-basedir = os.path.dirname(os.path.realpath(__file__))
-
-sio = socketio.Server(async_mode=None , cors_allowed_origins = '*' )
-
-thread = None
-
-#Create your views here.
+class TakeAcionView(APIView):
+    # permission_classes = [HasGreenhouse & IsAuthenticated]
+    def post(self , request):
+        pass
 
 
-def index(request):
-    global thread
-    if thread is None:
-        thread = sio.start_background_task(background_thread)
-    return render(request, 'index.html')
 
-
-def background_thread():
-    """Example of how to send server generated events to clients."""
-    count = 0
-    while True:
-        sio.sleep(10)
-        count += 1
-        sio.emit('my_response', {
-            'data': 'Server generated event'}, namespace='/test')
-
-
-@sio.event
-def send(sid, data):
-    message = data['message']
-    sio.emit('my_response', {
-        'message': message,
-    })
 

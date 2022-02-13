@@ -1,0 +1,781 @@
+from django.shortcuts import render
+import os
+import socketio
+
+
+
+basedir = os.path.dirname(os.path.realpath(__file__))
+
+sio = socketio.Server(async_mode=None , cors_allowed_origins = '*' )
+#sio = socketio.Server(logger=True, engineio_logger=True)
+
+thread = None
+
+#Create your views here.
+
+
+def index(request):
+    global thread
+    if thread is None:
+        thread = sio.start_background_task(background_thread)
+    return render(request, 'index.html')
+
+
+def background_thread():
+    """Example of how to send server generated events to clients."""
+    count = 0
+    while True:
+        sio.sleep(10)
+        count += 1
+        sio.emit('my_response', {
+            'data': 'Server generated event'}, namespace='/test')
+
+
+# The environ argument is a dictionary in standard WSGI format containing the request information, including HTTP headers.
+# The auth argument contains any authentication details passed by the client, or None if the client did not pass anything. 
+# After inspecting the request, the connect event handler can return False to reject the connection with the client.
+#  raise socketio.exceptions.ConnectionRefusedError('authentication failed')
+
+
+
+
+#Sometimes the server may want to send an event just to a particular client. This can be achieved by adding a room argument to the emit call:
+#sio.emit('my event', {'data': 'foobar'}, room=user_sid)
+
+
+
+# class MyCustomNamespace(socketio.Namespace):
+#     def on_connect(self, sid, environ):
+#         pass
+
+#     def on_disconnect(self, sid):
+#         pass
+
+#     def on_my_event(self, sid, data):
+#         self.emit('my_response', data)
+
+# sio.register_namespace(MyCustomNamespace('/test'))
+
+
+@sio.event
+def connect(sid, environ, auth):
+    print('connect ', sid)
+
+@sio.event
+def disconnect(sid):
+    print('disconnect ', sid)
+    
+    
+
+# @sio.event
+# def send(sid, data):
+#     message = data['message']
+#     sio.emit('my_response', {
+#         'message': message,
+#     })
+
+
+# @sio.event
+# def connect(sid,data):
+#     sio.emit('my_response', {
+#         'message': "Welcome to our server",
+#     })
+    
+    
+# @sio.event
+# def my_event(sid, message):
+#     sio.emit('my_response', {'data': message['data']}, room=sid)
+
+
+# @sio.event
+# def my_broadcast_event(sid, message):
+#     sio.emit('my_response', {'data': message['data']})
+
+
+# @sio.event
+# def join(sid, message):
+#     sio.enter_room(sid, message['room'])
+#     sio.emit('my_response', {'data': 'Entered room: ' + message['room']},
+#              room=sid)
+
+
+# @sio.event
+# def leave(sid, message):
+#     sio.leave_room(sid, message['room'])
+#     sio.emit('my_response', {'data': 'Left room: ' + message['room']},
+#              room=sid)
+
+
+# @sio.event
+# def close_room(sid, message):
+#     sio.emit('my_response',
+#              {'data': 'Room ' + message['room'] + ' is closing.'},
+#              room=message['room'])
+#     sio.close_room(message['room'])
+
+
+# @sio.event
+# def my_room_event(sid, message):
+#     sio.emit('my_response', {'data': message['data']}, room=message['room'])
+
+
+# @sio.event
+# def disconnect_request(sid):
+#     sio.disconnect(sid)
+
+
+# @sio.event
+# def connect(sid, environ):
+#     sio.emit('my_response', {'data': 'Connected', 'count': 0}, room=sid)
+
+
+# @sio.event
+# def disconnect(sid):
+#     print('Client disconnected')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+from django.shortcuts import render
+import os
+import socketio
+
+
+
+basedir = os.path.dirname(os.path.realpath(__file__))
+
+sio = socketio.Server(async_mode=None , cors_allowed_origins = '*' )
+#sio = socketio.Server(logger=True, engineio_logger=True)
+
+thread = None
+
+#Create your views here.
+
+
+def index(request):
+    global thread
+    if thread is None:
+        thread = sio.start_background_task(background_thread)
+    return render(request, 'index.html')
+
+
+def background_thread():
+    """Example of how to send server generated events to clients."""
+    count = 0
+    while True:
+        sio.sleep(10)
+        count += 1
+        sio.emit('my_response', {
+            'data': 'Server generated event'}, namespace='/hardwareClient')
+
+
+
+class HardwareNamespace(socketio.Namespace):
+    def connect(self, sid, environ):
+        print(sid)
+        print(environ)
+        sio.emit('my_response', {
+            'message': "Welcome to our server",
+        })
+
+    def disconnect(self, sid):
+        pass
+    
+    
+
+class WebNamespace(socketio.Namespace):
+    def connect(self, sid, environ):
+        pass
+
+    def disconnect(self, sid):
+        pass
+    
+class MobileNamespace(socketio.Namespace):
+    def connect(self, sid, environ):
+        pass
+
+    def disconnect(self, sid):
+        pass
+
+
+
+sio.register_namespace(HardwareNamespace('/hardwareClient'))
+sio.register_namespace(WebNamespace('/webClient'))
+sio.register_namespace(MobileNamespace('/mobileClient'))
+
+
+
+# The environ argument is a dictionary in standard WSGI format containing the request information, including HTTP headers.
+# The auth argument contains any authentication details passed by the client, or None if the client did not pass anything. 
+# After inspecting the request, the connect event handler can return False to reject the connection with the client.
+#  raise socketio.exceptions.ConnectionRefusedError('authentication failed')
+
+
+
+
+#Sometimes the server may want to send an event just to a particular client. This can be achieved by adding a room argument to the emit call:
+#sio.emit('my event', {'data': 'foobar'}, room=user_sid)
+
+
+
+# class MyCustomNamespace(socketio.Namespace):
+#     def on_connect(self, sid, environ):
+#         pass
+
+#     def on_disconnect(self, sid):
+#         pass
+
+#     def on_my_event(self, sid, data):
+#         self.emit('my_response', data)
+
+# sio.register_namespace(MyCustomNamespace('/test'))
+
+
+# @sio.event
+# def connect(sid, environ, auth):
+#     print('connect ', sid)
+
+# @sio.event
+# def disconnect(sid):
+#     print('disconnect ', sid)
+    
+    
+
+# @sio.event
+# def send(sid, data):
+#     message = data['message']
+#     sio.emit('my_response', {
+#         'message': message,
+#     })
+
+
+# @sio.event
+# def connect(sid,data):
+#     sio.emit('my_response', {
+#         'message': "Welcome to our server",
+#     })
+    
+    
+# @sio.event
+# def my_event(sid, message):
+#     sio.emit('my_response', {'data': message['data']}, room=sid)
+
+
+# @sio.event
+# def my_broadcast_event(sid, message):
+#     sio.emit('my_response', {'data': message['data']})
+
+
+# @sio.event
+# def join(sid, message):
+#     sio.enter_room(sid, message['room'])
+#     sio.emit('my_response', {'data': 'Entered room: ' + message['room']},
+#              room=sid)
+
+
+# @sio.event
+# def leave(sid, message):
+#     sio.leave_room(sid, message['room'])
+#     sio.emit('my_response', {'data': 'Left room: ' + message['room']},
+#              room=sid)
+
+
+# @sio.event
+# def close_room(sid, message):
+#     sio.emit('my_response',
+#              {'data': 'Room ' + message['room'] + ' is closing.'},
+#              room=message['room'])
+#     sio.close_room(message['room'])
+
+
+# @sio.event
+# def my_room_event(sid, message):
+#     sio.emit('my_response', {'data': message['data']}, room=message['room'])
+
+
+# @sio.event
+# def disconnect_request(sid):
+#     sio.disconnect(sid)
+
+
+# @sio.event
+# def connect(sid, environ):
+#     sio.emit('my_response', {'data': 'Connected', 'count': 0}, room=sid)
+
+
+# @sio.event
+# def disconnect(sid):
+#     print('Client disconnected')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+from django.shortcuts import render
+import os
+import socketio
+
+
+
+basedir = os.path.dirname(os.path.realpath(__file__))
+
+sio = socketio.Server(async_mode=None , cors_allowed_origins = '*' )
+#sio = socketio.Server(logger=True, engineio_logger=True)
+
+thread = None
+
+#Create your views here.
+
+
+def index(request):
+    global thread
+    if thread is None:
+        thread = sio.start_background_task(background_thread)
+    return render(request, 'index.html')
+
+
+def background_thread():
+    """Example of how to send server generated events to clients."""
+    count = 0
+    while True:
+        sio.sleep(10)
+        count += 1
+        sio.emit('my_response', {
+            'data': 'Server generated event'}, namespace='/')
+
+
+
+# class HardwareNamespace(socketio.Namespace):
+#     def connect(self, sid, environ):
+#         print(sid)
+#         print(environ)
+#         sio.emit('my_response', {
+#             'message': "Welcome to our server",
+#         })
+
+#     def disconnect(self, sid):
+#         pass
+    
+    
+
+# class WebNamespace(socketio.Namespace):
+#     def connect(self, sid, environ):
+#         pass
+
+#     def disconnect(self, sid):
+#         pass
+    
+# class MobileNamespace(socketio.Namespace):
+#     def connect(self, sid, environ):
+#         pass
+
+#     def disconnect(self, sid):
+#         pass
+
+
+
+# sio.register_namespace(HardwareNamespace('/hardwareClient'))
+# sio.register_namespace(WebNamespace('/webClient'))
+# sio.register_namespace(MobileNamespace('/mobileClient'))
+
+
+
+# The environ argument is a dictionary in standard WSGI format containing the request information, including HTTP headers.
+# The auth argument contains any authentication details passed by the client, or None if the client did not pass anything. 
+# After inspecting the request, the connect event handler can return False to reject the connection with the client.
+#  raise socketio.exceptions.ConnectionRefusedError('authentication failed')
+
+
+
+
+#Sometimes the server may want to send an event just to a particular client. This can be achieved by adding a room argument to the emit call:
+#sio.emit('my event', {'data': 'foobar'}, room=user_sid)
+
+
+
+# class MyCustomNamespace(socketio.Namespace):
+#     def on_connect(self, sid, environ):
+#         pass
+
+#     def on_disconnect(self, sid):
+#         pass
+
+#     def on_my_event(self, sid, data):
+#         self.emit('my_response', data)
+
+# sio.register_namespace(MyCustomNamespace('/test'))
+
+
+# @sio.event
+# def connect(sid, environ, auth):
+#     print('connect ', sid)
+
+# @sio.event
+# def disconnect(sid):
+#     print('disconnect ', sid)
+    
+    
+
+# @sio.event
+# def send(sid, data):
+#     message = data['message']
+#     sio.emit('my_response', {
+#         'message': message,
+#     })
+
+
+@sio.event
+def connect(sid,data):
+    print(f"Hellow {sid}")
+    sio.emit('my_response', {
+        'message': "Welcome to our server",
+    })
+    
+    
+# @sio.event
+# def my_event(sid, message):
+#     sio.emit('my_response', {'data': message['data']}, room=sid)
+
+
+# @sio.event
+# def my_broadcast_event(sid, message):
+#     sio.emit('my_response', {'data': message['data']})
+
+
+# @sio.event
+# def join(sid, message):
+#     sio.enter_room(sid, message['room'])
+#     sio.emit('my_response', {'data': 'Entered room: ' + message['room']},
+#              room=sid)
+
+
+# @sio.event
+# def leave(sid, message):
+#     sio.leave_room(sid, message['room'])
+#     sio.emit('my_response', {'data': 'Left room: ' + message['room']},
+#              room=sid)
+
+
+# @sio.event
+# def close_room(sid, message):
+#     sio.emit('my_response',
+#              {'data': 'Room ' + message['room'] + ' is closing.'},
+#              room=message['room'])
+#     sio.close_room(message['room'])
+
+
+# @sio.event
+# def my_room_event(sid, message):
+#     sio.emit('my_response', {'data': message['data']}, room=message['room'])
+
+
+# @sio.event
+# def disconnect_request(sid):
+#     sio.disconnect(sid)
+
+
+# @sio.event
+# def connect(sid, environ):
+#     sio.emit('my_response', {'data': 'Connected', 'count': 0}, room=sid)
+
+
+# @sio.event
+# def disconnect(sid):
+#     print('Client disconnected')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+from django.shortcuts import render
+import os
+import socketio
+
+
+basedir = os.path.dirname(os.path.realpath(__file__))
+
+sio = socketio.Server(async_mode=None , cors_allowed_origins = '*' )
+#sio = socketio.Server(logger=True, engineio_logger=True)
+
+thread = None
+
+#Create your views here.
+
+
+# def index(request):
+#     global thread
+#     print("Ssssssssssssssss")
+#     if thread is None:
+#         thread = sio.start_background_task(background_thread)
+#     return True
+
+
+# def background_thread():
+#     """Example of how to send server generated events to clients."""
+#     count = 0
+#     while True:
+#         sio.sleep(10)
+#         count += 1
+#         # sio.emit('my_response', {
+#         #     'data': 'Server generated event'}, namespace='/chat')
+#         sio.emit('my_response', {
+#             'data': 'Server generated event'}, namespace='')
+
+
+# @sio.event(namespace='/hardwareClient')
+# def connect(sid, environ):
+#     print("tets")
+#     # sio.emit('my_response', {'data': 'Connected', 'count': 0}, room=sid)
+#     sio.emit('my_response', {
+#             'data': 'Server generated evenwwt'} , namespace='/webClient')
+
+
+# @sio.event
+# def disconnect(sid):
+#     print('Client disconnected')
+    
+    
+
+class HardwareNamespace(socketio.Namespace):
+    def on_connect(self, sid, environ):
+        sio.emit('connection_status', {'data': 'Server generated event'}, room=sid , namespace='/hardware')
+
+    def on_disconnect(self, sid):
+        pass
+    
+class WebNamespace(socketio.Namespace):
+    def on_connect(self, sid, environ):
+        sio.emit('connection_status', {
+            'data': 'Server generated event'}, room=sid , namespace='/hardware' )
+        pass
+
+    def on_disconnect(self, sid):
+        pass
+    
+    
+class MobileNamespace(socketio.Namespace):
+    def on_connect(self, sid, environ):
+        sio.emit('connection_status', {
+            'data': 'Server generated event'}, namespace='/webClient')
+        pass
+
+    def on_disconnect(self, sid):
+        pass
+    
+sio.register_namespace(HardwareNamespace('/hardware'))
+sio.register_namespace(WebNamespace('/web/front'))
+sio.register_namespace(MobileNamespace('/mobileClient'))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# The environ argument is a dictionary in standard WSGI format containing the request information, including HTTP headers.
+# The auth argument contains any authentication details passed by the client, or None if the client did not pass anything. 
+# After inspecting the request, the connect event handler can return False to reject the connection with the client.
+#  raise socketio.exceptions.ConnectionRefusedError('authentication failed')
+
+
+
+
+#Sometimes the server may want to send an event just to a particular client. This can be achieved by adding a room argument to the emit call:
+#sio.emit('my event', {'data': 'foobar'}, room=user_sid)
+
+
+
+# class MyCustomNamespace(socketio.Namespace):
+#     def on_connect(self, sid, environ):
+#         pass
+
+#     def on_disconnect(self, sid):
+#         pass
+
+#     def on_my_event(self, sid, data):
+#         self.emit('my_response', data)
+
+# sio.register_namespace(MyCustomNamespace('/test'))
+
+
+# @sio.event
+# def connect(sid, environ, auth):
+#     print('connect ', sid)
+
+# @sio.event
+# def disconnect(sid):
+#     print('disconnect ', sid)
+    
+    
+
+# @sio.event
+# def send(sid, data):
+#     message = data['message']
+#     sio.emit('my_response', {
+#         'message': message,
+#     })
+
+
+# @sio.event
+# def connect(sid,data):
+#     print(f"Hellow {sid}")
+#     sio.emit('my_response', {
+#         'message': "Welcome to our server",
+#     })
+    
+    
+# @sio.event
+# def my_event(sid, message):
+#     sio.emit('my_response', {'data': message['data']}, room=sid)
+
+
+# @sio.event
+# def my_broadcast_event(sid, message):
+#     sio.emit('my_response', {'data': message['data']})
+
+
+# @sio.event
+# def join(sid, message):
+#     sio.enter_room(sid, message['room'])
+#     sio.emit('my_response', {'data': 'Entered room: ' + message['room']},
+#              room=sid)
+
+
+# @sio.event
+# def leave(sid, message):
+#     sio.leave_room(sid, message['room'])
+#     sio.emit('my_response', {'data': 'Left room: ' + message['room']},
+#              room=sid)
+
+
+# @sio.event
+# def close_room(sid, message):
+#     sio.emit('my_response',
+#              {'data': 'Room ' + message['room'] + ' is closing.'},
+#              room=message['room'])
+#     sio.close_room(message['room'])
+
+
+# @sio.event
+# def my_room_event(sid, message):
+#     sio.emit('my_response', {'data': message['data']}, room=message['room'])
+
+
+# @sio.event
+# def disconnect_request(sid):
+#     sio.disconnect(sid)
+
+

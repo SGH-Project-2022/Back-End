@@ -4,6 +4,8 @@ from django.utils.crypto import get_random_string
 from numpy import require
 from Apps.UsersApp.models import User
 from Apps.PlantsApp.models import Plant
+from Apps.HardwareApp.models import Sensor
+from Apps.HardwareApp.models import Actuator
 # Create your models here.
 
 
@@ -37,5 +39,7 @@ class Greenhouse(models.Model):
     
     plants = models.ManyToManyField(Plant , related_name="greenhouse_plant"  , null=True , blank=False)
     
+    sensors = models.ManyToManyField(Sensor , related_name="greenhouse_sensros")
+    actuators = models.ManyToManyField(Actuator , related_name="greenhouse_actuators")
     def __str__(self):
         return str(self.id)

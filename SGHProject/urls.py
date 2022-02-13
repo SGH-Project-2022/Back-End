@@ -23,6 +23,7 @@ urlpatterns = [
     path('user/',include('Apps.UsersApp.urls')),
     path('',include('Apps.GreenhousesApp.urls')),
     path('',include('Apps.PlantsApp.urls')),
+    path('',include('Apps.HardwareApp.urls')),
     
     # path('',include('Apps.GreenhouseApp.urls')),
 ]
