@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-1^8x*)c4mjbfhj(g7z2j9$bqm&-k066unoxv*h=n!%b+ryeo1*
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -55,19 +55,19 @@ INSTALLED_APPS = [
     'corsheaders',
     
     # My Apps
-    'Apps.UsersApp',
-    'Apps.GreenhousesApp',
-    'Apps.PlantsApp',
-    'Apps.HardwareApp',
+    'Apps.Users',
+    'Apps.Greenhouses',
+    'Apps.Plants',
+    'Apps.Hardware',
 
-    # 'Apps.WaterComponentApp',
-    # 'Apps.NotificationApp',
+    # 'Apps.WaterComponent',
+    # 'Apps.Notification',
 
 ]
 
 
 
-MIDDLEWARE = [
+MIDDLEWARE = [    
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -79,6 +79,7 @@ MIDDLEWARE = [
     # For cors-header
     'corsheaders.middleware.CorsMiddleware',
 ]
+
 
 ROOT_URLCONF = 'SGHProject.urls'
 
@@ -155,6 +156,8 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
+STATIC_ROOT = 'static/'
+
 
 STATIC_URL = 'static/'
 
@@ -192,7 +195,7 @@ CORS_ALLOW_HEADERS = list(default_headers) + [
 
 # For Auth
 
-AUTH_USER_MODEL = 'UsersApp.User'
+AUTH_USER_MODEL = 'Users.User'
 
 
 REST_FRAMEWORK = {

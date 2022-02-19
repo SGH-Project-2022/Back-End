@@ -20,13 +20,14 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('user/',include('Apps.UsersApp.urls')),
-    path('',include('Apps.GreenhousesApp.urls')),
-    path('',include('Apps.PlantsApp.urls')),
-    path('',include('Apps.HardwareApp.urls')),
+    path('user/',include('Apps.Users.urls')),
+    path('',include('Apps.Greenhouses.urls')),
+    path('',include('Apps.Plants.urls')),
+    path('',include('Apps.Hardware.urls')),
     
     # path('',include('Apps.GreenhouseApp.urls')),
 ]
 
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.STATIC_ROOT, document_root=settings.STATIC_ROOT)

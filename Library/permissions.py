@@ -1,6 +1,6 @@
 from sys import api_version
 from rest_framework.permissions import BasePermission
-from Apps.GreenhousesApp.models import Greenhouse
+from Apps.Greenhouses.models import Greenhouse
 from rest_framework import exceptions
 from .api_response import ApiResponse
 from rest_framework import status

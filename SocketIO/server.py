@@ -19,17 +19,24 @@ thread = None
 class HardwareNamespace(socketio.Namespace):
     
     def on_connect(self, sid, environ):
+        sio.enter_room(sid, 'myGreenhouse' , namespace='/hardware')
+        # sio.enter_room(sio.get_sid(namespace='/hardware'), 'myGreenhouse')
+
         rest_api_response()
         response = api_response.set_status_code(200).set_data('message','Hardware connected to server successfully').get()
-        self.emit('connection_status', response , room=sid , namespace='/hardware')
+        self.emit('connection_status', response  , namespace='/hardware')
         self.emit('hardware_connection', response  , namespace='/web')
         self.emit('hardware_connection', response ,  namespace='/mobile')
 
     def on_sensors_values(self , sid , message):
         rest_api_response()
         response = api_response.set_status_code(200).set_data('message','sensor values').get()
-        self.emit('sensors_values', response  , namespace='/web')
-        self.emit('sensors_values', response ,  namespace='/mobile')
+        self.emit('sensors_values', response  , namespace='/web'  ,  room='myGreenhouse' )
+        self.emit('sensors_values', response ,  namespace='/mobile' ,  room='myGreenhouse')
+        # self.emit('sensors_values', response  , namespace='/web'  , room='myGreenhouse', skip_sid=sid)
+        # self.emit('sensors_values', response ,  namespace='/mobile'  , room='myGreenhouse', skip_sid=sid)
+        # sio.emit('my reply', data, room='chat_users', skip_sid=sid)
+
 
     def on_disconnect(self, sid):
         rest_api_response()
@@ -46,6 +53,7 @@ sio.register_namespace(HardwareNamespace('/hardware'))
 class WebNamespace(socketio.Namespace):
     
     def on_connect(self, sid, environ):
+        sio.enter_room(sid, 'myGreenhouse' , namespace="/web")
         rest_api_response()
         response = api_response.set_status_code(200).set_data('message','Connected to server successfully').get()
         sio.emit('connection_status', response , room=sid , namespace='/web')
@@ -125,85 +133,4 @@ sio.register_namespace(MobileNamespace('/mobile'))
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# import os
-# import socketio
-# from Library.api_response import ApiResponse
-
-
-# basedir = os.path.dirname(os.path.realpath(__file__))
-# sio = socketio.Server(async_mode=None , cors_allowed_origins = '*' , logger=True, engineio_logger=True)
-# thread = None   
-
-
-# api_response = ApiResponse()
-# def rest_api_response():
-#     api_response.__init__()
-    
-
-# # # Clients 
-# # HARDWARE   = 1 
-# # WEB_FRONTEND = 2 
-# # MOBILE_APP   = 3 
-
-# # def get_client(requset):
-# #     if "client" in requset.keys:
-
-# #------------------------------------------------------ Events
-# class SGHNamespace(socketio.Namespace):
-    
-#     def on_connect(self, sid, environ):
-#         rest_api_response()
-#         response = api_response.set_status_code(200).set_data('message','Hardware connected to server successfully').get()
-#         self.emit('connection_status', response , room=sid , namespace='/hardware')
-#         self.emit('hardware_connection', response  , namespace='/web')
-#         self.emit('hardware_connection', response ,  namespace='/mobile')
-
-#     def on_sensors_values(self , sid , message):
-#         rest_api_response()
-#         response = api_response.set_status_code(200).set_data('message','sensor values').get()
-#         self.emit('sensors_values', response  , namespace='/web')
-#         self.emit('sensors_values', response ,  namespace='/mobile')
-
-#     def on_disconnect(self, sid):
-#         rest_api_response()
-#         response = api_response.set_status_code(400).set_data('message','Hardware disconnected').get()
-#         self.emit('hardware_connection', response  , namespace='/web')
-#         self.emit('hardware_connection', response ,  namespace='/mobile')
-    
-# sio.register_namespace(SGHNamespace('/sgh'))
 
