@@ -20,32 +20,14 @@ class Sensor(models.Model):
     image_tag.allow_tags = True
 
     
-
-
-
-
-
 class SensorValues(models.Model):
     value = models.CharField(max_length=50)
     sensor = models.ForeignKey(Sensor , on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-    greenhouse = models.ForeignKey("Greenhouses.Greenhouse" , on_delete=models.CASCADE)
+    greenhouse = models.ForeignKey("Greenhouses.Greenhouse" , related_name="greenhouse_sensor_values" ,on_delete=models.CASCADE)
     
     def __str__(self):
         return self.value
-    
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 class Actuator(models.Model):
@@ -59,13 +41,11 @@ class Actuator(models.Model):
     def image_tag(self):
         return mark_safe(f'<img src="{self.image.url}" width="100" />')
     
+    image_tag.short_description = 'Image'
+    image_tag.allow_tags = True
+    
     def __str__(self):
         return self.name
-
-
-
-
-
 
 
 class ActuatorsAction(models.Model):

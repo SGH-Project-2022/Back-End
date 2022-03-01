@@ -1,0 +1,255 @@
+from urllib import response
+from rest_framework import serializers
+from Apps.Greenhouses.models import Greenhouse , GreenhouseActustor , GreenhouseSensor
+from .models import Sensor , Actuator , ActuatorsAction , SensorValues  
+from rest_framework.response import Response
+from rest_framework import status
+from Library.api_response import ApiResponse
+import requests
+import json
+
+
+class SensorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Sensor
+        fields = "__all__"
+        
+
+class ActuatorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Actuator
+        fields = "__all__"
+        
+
+
+# {
+#     "greenhouse_id": 1,
+#     "password":"mqN9weY",
+#     "sensors":[
+#         {
+#             "sensor_id":1,
+#              "value" : 10 
+#         }
+#     ]
+# }
+
+class SensorValuesSerializer(serializers.Serializer):
+    
+    greenhouse_id = serializers.IntegerField()
+    password = serializers.CharField()
+    sensors = serializers.ListField()
+
+    def validate(self, data):
+        api_response = ApiResponse()
+
+        try:
+            self.greenhouse = Greenhouse.objects.get(pk = data["greenhouse_id"] , password = data["password"])
+        except Greenhouse.DoesNotExist:
+            response = api_response.set_status_code(status.HTTP_404_NOT_FOUND).set_data("errors", "A greenhouse with this ID and password is not found.").get()
+            raise serializers.ValidationError(detail=response)
+        
+        for sensor in data["sensors"]:
+            try:
+                my_sensor = Sensor.objects.get(pk = sensor['sensor_id']) 
+                GreenhouseSensor.objects.get(sensor = my_sensor , greenhouse = self.greenhouse)
+            
+            except ( Sensor.DoesNotExist , GreenhouseSensor.DoesNotExist ):
+                response = api_response.set_status_code(status.HTTP_404_NOT_FOUND).set_data("errors", "This sensor not integrated with this greenhouse or not exist").get()
+                raise serializers.ValidationError(detail=response)
+            
+        return data
+        
+    def save(self,  **kwargs):
+        api_response = ApiResponse()
+
+        # greenhouse = Greenhouse.objects.get(pk = self.data["greenhouse_id"] , password = self.data["password"])
+        response = api_response.set_data("greenhouse",self.greenhouse)
+        
+        sensors = []
+        
+        for sensor in self.data["sensors"]:
+            my_sensor = Sensor.objects.get(pk = sensor['sensor_id'])
+            SensorValues.objects.create(
+                greenhouse = self.greenhouse,
+                sensor = my_sensor ,
+                value = sensor["value"]
+            )
+            greenhouse_sensor = GreenhouseSensor.objects.get(sensor = my_sensor , greenhouse = self.greenhouse)
+            sensor_test = GreenhouseSensor.objects.get(owner__greenhouse__id = self.data["greenhouse_id"])
+            
+            sensors.append({
+                "sensor_id" : my_sensor.id,
+                "name" : my_sensor.name,
+                "messure" : my_sensor.messure,
+                
+                "position": greenhouse_sensor.position,
+                
+                "sensor_test":sensor_test
+                
+            })
+            
+        greenhouse_response = {
+            "greenhouse": self.greenhouse,
+            "sensors": {
+                "sensor_id" : 1,
+                "name": "DHT11",
+                "messure": "tt",
+                
+                "position": "tt",
+                
+                "value": 10,
+                "created_at": 10
+            }
+        }
+        return json.dumps(sensors)
+# value = models.CharField(max_length=50)
+#     sensor = models.ForeignKey(Sensor , on_delete=models.CASCADE)
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     greenhouse = models.ForeignKey("Greenhouses.Greenhouse" , on_delete=models.CASCADE)
+    
+        
+
+# class ActuatorActionsSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = ActuatorsAction
+#         fields = "__all__"
+        
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    def save(self,  **kwargs):
+        api_response = ApiResponse()
+        response = { 
+            "greenhouse" : GreenhouseSerializers(self.greenhouse).data ,
+            "sensors": []
+        }
+        for sensor in self.data["sensors"]:
+            my_sensor = Sensor.objects.get(pk = sensor['sensor_id'])
+            sensor_value = SensorValues.objects.create(
+                greenhouse = self.greenhouse,
+                sensor = my_sensor ,
+                value = sensor["value"]
+            )
+            response["sensors"].append(SensorValueSerializers(sensor_value ).data)
+
+        return  response
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    from urllib import response
+from rest_framework import serializers
+from Apps.Greenhouses.models import Greenhouse , GreenhouseActustor , GreenhouseSensor
+from .models import Sensor , Actuator , ActuatorsAction , SensorValues  
+from rest_framework.response import Response
+from rest_framework import status
+from Library.api_response import ApiResponse
+from Apps.Plants.serializers import PlantsSerializer
+
+
+class SensorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Sensor
+        fields = "__all__"
+        
+
+class ActuatorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Actuator
+        fields = "__all__"
+        
+
+
+class SensorValueSerializers(serializers.ModelSerializer):
+    sensor = SensorSerializer()
+    class Meta:
+        model = SensorValues
+        fields = "__all__"
+        extra_kwargs = {
+            'greenhouse': {'write_only': True },  
+        }
+    
+    
+class SensorValuesSerializer(serializers.Serializer):
+    
+    greenhouse_id = serializers.IntegerField()
+    password = serializers.CharField()
+    sensors = serializers.ListField()
+
+    def validate(self, data):
+        api_response = ApiResponse()
+
+        try:
+            self.greenhouse = Greenhouse.objects.get(pk = data["greenhouse_id"] , password = data["password"])
+        except Greenhouse.DoesNotExist:
+            response = api_response.set_status_code(status.HTTP_404_NOT_FOUND).set_data("errors", "A greenhouse with this ID and password is not found.").get()
+            raise serializers.ValidationError(detail=response)
+        
+        for sensor in data["sensors"]:
+            try:
+                my_sensor = Sensor.objects.get(pk = sensor['sensor_id']) 
+                GreenhouseSensor.objects.get(sensor = my_sensor , greenhouse = self.greenhouse)
+            
+            except ( Sensor.DoesNotExist , GreenhouseSensor.DoesNotExist ):
+                response = api_response.set_status_code(status.HTTP_404_NOT_FOUND).set_data("errors", "This sensor not integrated with this greenhouse or not exist").get()
+                raise serializers.ValidationError(detail=response)
+            
+        return data
+        
+    def save(self,  **kwargs):
+        
+        response = []
+        for sensor in self.data["sensors"]:
+            my_sensor = Sensor.objects.get(pk = sensor['sensor_id'])
+            sensor_value = SensorValues.objects.create(
+                greenhouse = self.greenhouse,
+                sensor = my_sensor ,
+                value = sensor["value"]
+            )
+            response.append(sensor_value)
+
+        return  response
+    
+    def get_greenhouse(self):
+        return self.greenhouse
+
+# class ActuatorActionsSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = ActuatorsAction
+#         fields = "__all__"
+        
+    

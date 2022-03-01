@@ -46,6 +46,7 @@ class LoginView(APIView):
         serializer = UserLoginSerializer(data = request.data)
         
         if not serializer.is_valid():
+            print(serializer.errors)
             return api_response.set_status_code(status.HTTP_400_BAD_REQUEST).set_data("errors", serializer.errors).response()
 
         user , refresh , token = serializer.login()

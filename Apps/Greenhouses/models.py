@@ -42,6 +42,8 @@ class Greenhouse(models.Model):
     actuators = models.ManyToManyField(Actuator , related_name="greenhouse_actuators" , through= 'GreenhouseActustor')
     
     
+    token = models.TextField(max_length=500 , null = True, blank=True)
+    
     def __str__(self):
         return str(self.id)
 

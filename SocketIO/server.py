@@ -1,15 +1,15 @@
 import os
 import socketio
 from Library.api_response import ApiResponse
+from rest_framework import status
+from Apps.Hardware.serializers import SensorValueSerializer , SensorSerializer , ActuatorSerializer , StoreSensorValuesSerializer
+from Apps.Greenhouses.serializers import GreenhouseSerializers , GreenhouseAuthSerializer
+from Library.api_response import ApiResponse
 
-api_response = ApiResponse()
-
-def rest_api_response():
-    api_response.__init__()
 
 basedir = os.path.dirname(os.path.realpath(__file__))
 
-sio = socketio.Server(async_mode=None , cors_allowed_origins = '*' , logger=True, engineio_logger=True)
+sio = socketio.Server(async_mode=None  ,cors_allowed_origins = '*' , logger=True, engineio_logger=True)
 
 thread = None   
 
@@ -18,33 +18,62 @@ thread = None
 #------------------------------------------------------ Hardware Client
 class HardwareNamespace(socketio.Namespace):
     
-    def on_connect(self, sid, environ):
-        sio.enter_room(sid, 'myGreenhouse' , namespace='/hardware')
-        # sio.enter_room(sio.get_sid(namespace='/hardware'), 'myGreenhouse')
+    def on_connect(self, sid, message):
 
-        rest_api_response()
-        response = api_response.set_status_code(200).set_data('message','Hardware connected to server successfully').get()
-        self.emit('connection_status', response  , namespace='/hardware')
-        self.emit('hardware_connection', response  , namespace='/web')
-        self.emit('hardware_connection', response ,  namespace='/mobile')
+        print("BAdr")
+        # serializer = GreenhouseAuthSerializer(data = message )
+        
+        # if serializer.is_valid():
+        #     raise ConnectionRefusedError('authentication failed')
+        
+        # greenhouse , token = serializer.login()
+        
+        clients_response = ApiResponse()
+        hardware_response = ApiResponse()
+        
+        response = clients_response.set_status_code(200).set_data('message','Hardware connected successfully').get()
+
+        sio.enter_room(sid , namespace='/' ,  room="myGreenhouse")
+        self.emit('connection_status', hardware_response.set_data('token',"token").get()  , namespace='/', room="myGreenhouse")
+        self.emit('hardware_connection', response  , namespace='/web' ,  room="myGreenhouse")
+        self.emit('hardware_connection', response ,  namespace='/mobile' , room="myGreenhouse")
+        # sio.enter_room(sid, str(1) , namespace='/')
+        # self.emit('connection_status', hardware_response.set_data('token',"token").get()  , namespace='/', room=str(1))
+        # self.emit('hardware_connection', response  , namespace='/web' ,  room=str(1))
+        # self.emit('hardware_connection', response ,  namespace='/mobile' ,  room=str(1))
+        # sio.enter_room(sid, str(greenhouse.id) , namespace='/hardware')
+        # self.emit('connection_status', hardware_response.set_data('token',token).get()  , namespace='/hardware' , room=str(greenhouse.id))
+        # self.emit('hardware_connection', response  , namespace='/web' ,  room=str(greenhouse.id))
+        # self.emit('hardware_connection', response ,  namespace='/mobile' ,  room=str(greenhouse.id))
 
     def on_sensors_values(self , sid , message):
-        rest_api_response()
-        response = api_response.set_status_code(200).set_data('message','sensor values').get()
+        api_response = ApiResponse()
+        print(
+            'hello'
+        )
+        serializer = StoreSensorValuesSerializer(data = message)
+        
+        if not serializer.is_valid():
+            response = api_response.set_data("errors" , serializer.errors)
+        else:
+            sensor_values = serializer.save()
+            greenhouse = serializer.get_greenhouse()
+            api_response.set_status_code(status.HTTP_200_OK).set_data("greenhouse",GreenhouseSerializers(greenhouse).data).set_data("sensors",SensorValueSerializer(sensor_values,many=True).data)
+
+        response = api_response.get()
+            
         self.emit('sensors_values', response  , namespace='/web'  ,  room='myGreenhouse' )
         self.emit('sensors_values', response ,  namespace='/mobile' ,  room='myGreenhouse')
-        # self.emit('sensors_values', response  , namespace='/web'  , room='myGreenhouse', skip_sid=sid)
-        # self.emit('sensors_values', response ,  namespace='/mobile'  , room='myGreenhouse', skip_sid=sid)
-        # sio.emit('my reply', data, room='chat_users', skip_sid=sid)
 
 
     def on_disconnect(self, sid):
-        rest_api_response()
+        api_response = ApiResponse()
         response = api_response.set_status_code(400).set_data('message','Hardware disconnected').get()
-        self.emit('hardware_connection', response  , namespace='/web')
-        self.emit('hardware_connection', response ,  namespace='/mobile')
+        self.emit('hardware_connection', response  , namespace='/web' ,  room='myGreenhouse')
+        self.emit('hardware_connection', response ,  namespace='/mobile' ,  room='myGreenhouse')
     
-sio.register_namespace(HardwareNamespace('/hardware'))
+# sio.register_namespace(HardwareNamespace('/socket.io/hardware&transport=polling'))
+sio.register_namespace(HardwareNamespace('/'))
 
 
 
@@ -54,12 +83,12 @@ class WebNamespace(socketio.Namespace):
     
     def on_connect(self, sid, environ):
         sio.enter_room(sid, 'myGreenhouse' , namespace="/web")
-        rest_api_response()
+        api_response = ApiResponse()
         response = api_response.set_status_code(200).set_data('message','Connected to server successfully').get()
         sio.emit('connection_status', response , room=sid , namespace='/web')
         
     def on_take_action(self,sid,data):
-        rest_api_response()
+        api_response = ApiResponse()
         response = api_response.set_status_code(200).set_data('message','Please take action').get()
         self.emit('take_action', response  , namespace='/hardware')
 
@@ -75,12 +104,12 @@ sio.register_namespace(WebNamespace('/web'))
 #------------------------------------------------------ Mobile Client
 class MobileNamespace(socketio.Namespace):
     def on_connect(self, sid, environ):
-        rest_api_response()
+        api_response = ApiResponse()
         response = api_response.set_status_code(200).set_data('message','Connected to server successfully').get()
         sio.emit('connection_status', response , room=sid , namespace='/mobile')
 
     def on_take_action(self,sid,data):
-        rest_api_response()
+        api_response = ApiResponse()
         response = api_response.set_status_code(200).set_data('message','Please take action').get()
         self.emit('take_action', response  , namespace='/hardware')
         

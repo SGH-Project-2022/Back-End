@@ -1,14 +1,14 @@
-from xml.etree.ElementInclude import include
 from django.urls import path , include
 from . import views
 
 urlpatterns = [
-    # path('sgh/socket', views.index, name="index"),
-    path('hardware', include([
-        path('',views.SensorsValuesView.as_view()),    
+    path('hardware/', include([
+        path('sensors/values/store',views.StoreSensorsValuesView.as_view()),    
+        path('sensors/values/get/last',views.GetLastSensorValuesView.as_view()),    
+        path('sensors/values/get',views.GetAllSensorValuesView.as_view()),    
+        path('actuator/action',views.TakeAcionView.as_view()),    
+        path('actuators/actions/get/last',views.GetLastActionsView.as_view()),    
+        path('actuators/actions/get',views.GetAllActionsView.as_view()),    
     ])),
     
 ]
-
-
-#/sgh/socket/hardware

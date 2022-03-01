@@ -1,17 +1,24 @@
 from .models import Greenhouse 
 from Apps.Hardware.serializers import ActuatorSerializer
-from Apps.Hardware.serializers import SensorSerializer
+# from Apps.Hardware.serializers import SensorSerializer
 from rest_framework import serializers
 from Library.api_response import ApiResponse
 from rest_framework import status
 from django_countries.serializers import CountryFieldMixin
 from Apps.Plants.serializers import PlantsSerializer
+import jwt
+import datetime
+# from django.views.decorators import 
 
 class GreenhouseSerializers(CountryFieldMixin , serializers.ModelSerializer):
     plants = PlantsSerializer(many=True)
-    sensors = SensorSerializer(many=True)
+    # sensors = SensorSerializer(many=True)
     actuators = ActuatorSerializer(many=True)
     
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['sensors'].write_only = True
+            
     class Meta:
         model = Greenhouse
         fields = "__all__"
@@ -19,6 +26,7 @@ class GreenhouseSerializers(CountryFieldMixin , serializers.ModelSerializer):
             'password': {'write_only': True },  
             'user': {'write_only': True},
             'is_active':{'write_only':True},
+            'token':{'write_only':True},
         }
         def update(self, greenhouse ,validated_data):
             
@@ -95,3 +103,29 @@ class GetUserGreenhouseSerializer(serializers.Serializer):
             
         return greenhouse
 
+
+
+
+class GreenhouseAuthSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    password = serializers.CharField(max_length=10)
+    def login(self):
+        api_response = ApiResponse()
+
+        try:
+            greenhouse = Greenhouse.objects.get(pk=self.data["id"], password=self.data["password"] , is_active = True , user = not None, token = None)
+        except Greenhouse.DoesNotExist:
+            response = api_response.set_status_code(status.HTTP_400_BAD_REQUEST).set_data("errors", "Invalid id or password").get()
+            raise serializers.ValidationError(detail=response) 
+        payload = {
+            'id': greenhouse.id,
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
+            'iat': datetime.datetime.utcnow(),
+        }
+        token  = jwt.encode(payload,"secret",algorithm="HS256")
+
+        greenhouse.token = token 
+        greenhouse.save()
+        
+                
+        return (greenhouse , token)

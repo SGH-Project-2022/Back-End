@@ -1,12 +1,13 @@
 from rest_framework.views import APIView 
-from rest_framework.permissions import IsAuthenticated 
-from Library.permissions import HasGreenhouse
+from rest_framework.permissions import IsAuthenticated
+from Library import permissions 
+from Library.permissions import HasGreenhouse , IsGreenhouseAuthenticated
 from Apps.Greenhouses.models import Greenhouse
-from .serializers import GreenhouseSerializers, ConfigureGreenhouseSerializer, GetUserGreenhouseSerializer 
+from .serializers import GreenhouseSerializers, ConfigureGreenhouseSerializer, GetUserGreenhouseSerializer  , GreenhouseAuthSerializer
 from Library.api_response import ApiResponse
 from rest_framework.response import Response
 from rest_framework import status
-
+from rest_framework.permissions import AllowAny
 api_response = ApiResponse()
 
 
@@ -65,3 +66,30 @@ class UpdateGreenhouseView(APIView):
         
         return api_response.set_status_code(status.HTTP_200_OK).set_data("message","Updated successfully").set_data("greenhouse", serializer.data).response()
 
+
+class GreenhouseLoginView(APIView):
+
+    def post(self , request):
+    
+        serializer = GreenhouseAuthSerializer(data = request.data)
+        if not serializer.is_valid():
+            return api_response.set_status_code(status.HTTP_400_BAD_REQUEST).set_data("errors", serializer.errors).response()
+        
+        greenhouse , token = serializer.login()
+        
+        return api_response.set_status_code(status.HTTP_200_OK ).set_data("greenhouse", GreenhouseSerializers(greenhouse).data).set_data("token",token).response()
+
+
+class GreenhouseLogoutView(APIView):
+
+    permission_classes = [ IsGreenhouseAuthenticated ]
+
+    def get(self , request):
+        api_response.__init__()
+        
+        token = request.headers["Token"]
+        greenhouse = Greenhouse.objects.get(token=token)
+        greenhouse.token = None
+        greenhouse.save()
+
+        return api_response.set_status_code(status.HTTP_200_OK ).set_data("message", "Loggedout successfully").response()

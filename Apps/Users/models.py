@@ -14,7 +14,7 @@ class User(AbstractUser ):
 
     phone = PhoneNumberField(null=False, blank=False, unique=True)
 
-    image = models.ImageField( upload_to="UsersUploads/" , default = 'UsersUploads/defaultUserImage.png')
+    image = models.ImageField(null= True,blank = True,  upload_to="UsersUploads/" , default = 'UsersUploads/defaultUserImage.png')
 
     country = CountryField()
 
