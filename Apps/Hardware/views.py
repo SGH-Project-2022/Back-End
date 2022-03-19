@@ -24,8 +24,8 @@ class StoreSensorsValuesView(APIView):
         greenhouse = serializer.get_greenhouse()
         
         api_response.set_status_code(status.HTTP_200_OK)
-        api_response.set_data("greenhouse",GreenhouseSerializers(greenhouse).data)
-        api_response.set_data("sensors",SensorValueSerializer(sensor_values,many=True).data)
+        # api_response.set_data("greenhouse",GreenhouseSerializers(greenhouse).data)
+        api_response.set_data("sensor_values",SensorValueSerializer(sensor_values,many=True).data)
 
         return api_response.response()
 
@@ -71,7 +71,7 @@ class GetAllSensorValuesView(APIView):
 
 
 class TakeAcionView(APIView):
-    permission_classes = [IsAuthenticated & HasGreenhouse  ]
+    # permission_classes = [IsAuthenticated & HasGreenhouse  ]
 
     def post(self , request):
 

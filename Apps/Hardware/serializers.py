@@ -8,30 +8,30 @@ from Library.api_response import ApiResponse
 class SensorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sensor
-        fields = "__all__"
+        fields = ['id','name','messure']
+        
 
 
 class ActuatorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Actuator
         fields = "__all__"
-
+        fields = ['id','name','action']
+        
 
 class SensorValueSerializer(serializers.ModelSerializer):
-    sensor = SensorSerializer()
+    # sensor = SensorSerializer()
     class Meta:
         model = SensorValues
-        fields = "__all__"
-        extra_kwargs = {
-            'greenhouse': {'write_only': True },  
-        }
+        fields = ["value","created_at","sensor"]
 
 
 class ActuatorActionsSerializer(serializers.ModelSerializer):
-    actuator = ActuatorSerializer()
+    # actuator = ActuatorSerializer()
+        
     class Meta:
         model = ActuatorsAction
-        fields = "__all__"
+        fields = ["value","duration","created_at","actuator"]
 
 
 class StoreSensorValuesSerializer(serializers.Serializer):
@@ -151,7 +151,7 @@ class TakeActionSerializer(serializers.Serializer):
         
         try:
             self.actuator = Actuator.objects.get(pk = data["actuator_id"])
-            print("HEeelo")
+
         except Actuator.DoesNotExist:
             response = api_response.set_status_code(status.HTTP_404_NOT_FOUND).set_data("errors", "Undefind this actuator").get()
             raise serializers.ValidationError(detail=response)
