@@ -5,7 +5,7 @@ from SocketIO.socketio_server_settings import HARDWARE_NAMESPACE, WEB_NAMESPACE,
 
 from Apps.Hardware.serializers.models_serializers import SensorValueSerializer
 from Apps.Hardware.serializers.requests_serializers import StoreSensorValuesSerializer
-
+from FuzzyLogic.fuzzy_system_imlementation import FuzzyImplementation
 # ------------------------------------------------------ Hardware Client
 class HardwareNamespace(socketio.Namespace):
 
@@ -38,7 +38,10 @@ class HardwareNamespace(socketio.Namespace):
         else:
             print("Successfully ya mega")
             sensor_values = serializer.save()
-            print(sensor_values)
+            fuzzy = FuzzyImplementation()
+        
+            fuzzy.set_sensors_values(sensor_values)
+            fuzzy.take_actions()
             api_response.set_status_code(status.HTTP_200_OK).set_data("sensors", SensorValueSerializer(sensor_values, many=True).data)
 
             response = api_response.get()

@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from Library.permissions import HasGreenhouse , IsGreenhouseAuthenticated
 from .serializers.requests_serializers import TakeActionSerializer,  StoreSensorValuesSerializer , TakeAutomatedActionSerializer
 from .serializers.models_serializers import SensorSerializer, ActuatorSerializer,SensorValueSerializer,ActuatorActionsSerializer 
-
+from FuzzyLogic.fuzzy_system_imlementation import FuzzyImplementation
 from Library.api_response import ApiResponse
 
 api_response = ApiResponse()
@@ -34,6 +34,29 @@ class TakeAutomatedActionView(APIView):
 
 
 
+class StoreSensorsValuesFuzzyView(APIView):
+    # permission_classes = [IsGreenhouseAuthenticated]
+    
+    def post(self , request):
+        api_response.__init__()
+        
+        serializer = StoreSensorValuesSerializer(data = request.data)
+        
+        if not serializer.is_valid():
+            return Response(serializer.errors)
+        
+        sensor_values = serializer.save()
+
+        fuzzy = FuzzyImplementation()
+        
+        fuzzy.set_sensors_values(sensor_values)
+        fuzzy.take_actions()
+        
+        api_response.set_status_code(status.HTTP_200_OK)
+        # api_response.set_data("greenhouse",GreenhouseSerializers(greenhouse).data)
+        api_response.set_data("sensor_values",SensorValueSerializer(sensor_values,many=True).data)
+
+        return api_response.response()
 
 
 

@@ -22,13 +22,13 @@ class TempFuzzyLogic:
                 self.__temp_membership.universe, [60, 62.5, 65])
             self.__temp_membership['hot'] = fuzz.trapmf(
                 self.__temp_membership.universe, [65, 70, 80, 80])
-
-            self.__temp_rate_mambership['cold'] = fuzz.trimf(
-                self.__temp_rate_mambership .universe, [-50, -10, 0])
+            
+            self.__temp_rate_mambership['cold'] = fuzz.trapmf(
+                self.__temp_rate_mambership .universe, [-50,-50, -10, 0])
             self.__temp_rate_mambership['normal'] = fuzz.trimf(
                 self.__temp_rate_mambership .universe, [-10, 0, 10])
-            self.__temp_rate_mambership['hot'] = fuzz.trimf(
-                self.__temp_rate_mambership .universe, [0, 10, 50])
+            self.__temp_rate_mambership['hot'] = fuzz.trapmf(
+                self.__temp_rate_mambership .universe, [0, 10, 50,50])
 
             self.__fan_membership['slow'] = fuzz.trapmf(
                 self.__fan_membership.universe, [0, 0, 63, 127])
@@ -39,6 +39,7 @@ class TempFuzzyLogic:
 
             return True
         except:
+            print("Error in Temperature model in fuzzification process")
             return False
 
     def apply_rules(self):
@@ -67,6 +68,7 @@ class TempFuzzyLogic:
 
             return True
         except:
+            print("Error in Temperature model in apply rules process")
             return False
 
 
@@ -79,21 +81,24 @@ class TempFuzzyLogic:
             self.__fan_speed_ctrl = ctrl.ControlSystem(self.__rules)
             self.__fan_speed_simu = ctrl.ControlSystemSimulation(
                 self.__fan_speed_ctrl)
-            self.__fan_speed_simu.input['temperature'] = self.temperature
-            self.__fan_speed_simu.input['temperature_change_rate'] = self.temperature_rate
+            self.__fan_speed_simu.input['temperature'] = float(self.temperature)
+            self.__fan_speed_simu.input['temperature_change_rate'] = float(self.temperature_rate)
             self.__fan_speed_simu.compute()
-
             return True
         except:
+            print("Error in Temperature model defuzzification process")
             return False
 
     def get_ouput_values(self):
+        """ This return dict contain fan_speed value """
+    
         try:
             output = {
                 "fan_speed" : self.__fan_speed_simu.output['fan_speed']
             }
             return output
         except:
+            print("Error in Temperature model get output process")
             return False
 
 
