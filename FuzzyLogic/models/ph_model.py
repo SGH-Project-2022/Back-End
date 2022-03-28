@@ -191,8 +191,8 @@ class PHFuzzyLogic:
         """ This return dict contain ph_pump value and alkaline_pump value in order"""
         try:
             ouput = {
-                "ph_pump" : self.__pump_sim.output['ph_pump'],
-                "alkaline_pump": self.__pump_sim.output['alkaline_pump']
+                "ph_pump" : round(self.__pump_sim.output['ph_pump'],1),
+                "alkaline_pump": round(self.__pump_sim.output['alkaline_pump'],1)
             }
             return ouput
         except:

@@ -4,7 +4,9 @@ from skfuzzy import control as ctrl
 
 
 class TempFuzzyLogic:    
-
+    def __convert_to_fahrenheit(self,temp):
+        return (float(temp) * 1.8) + 32
+    
     def fuzzification(self):
         try:
 
@@ -46,25 +48,25 @@ class TempFuzzyLogic:
         try:
             self.__rules = []
             self.__rules.append(ctrl.Rule(
-                self.__temp_membership['cold'] | self.__temp_rate_mambership['cold'], self.__fan_membership['slow']))
+                self.__temp_membership['cold'] & self.__temp_rate_mambership['cold'], self.__fan_membership['slow']))
             self.__rules.append(ctrl.Rule(
-                self.__temp_membership['cold'] | self.__temp_rate_mambership['normal'], self.__fan_membership['medium']))
+                self.__temp_membership['cold'] & self.__temp_rate_mambership['normal'], self.__fan_membership['medium']))
             self.__rules.append(ctrl.Rule(
-                self.__temp_membership['cold'] | self.__temp_rate_mambership['hot'], self.__fan_membership['fast']))
+                self.__temp_membership['cold'] & self.__temp_rate_mambership['hot'], self.__fan_membership['medium']))
 
             self.__rules.append(ctrl.Rule(
-                self.__temp_membership['normal'] | self.__temp_rate_mambership['cold'], self.__fan_membership['medium']))
+                self.__temp_membership['normal'] & self.__temp_rate_mambership['cold'], self.__fan_membership['medium']))
             self.__rules.append(ctrl.Rule(
-                self.__temp_membership['normal'] | self.__temp_rate_mambership['normal'], self.__fan_membership['medium']))
+                self.__temp_membership['normal'] & self.__temp_rate_mambership['normal'], self.__fan_membership['medium']))
             self.__rules.append(ctrl.Rule(
-                self.__temp_membership['normal'] | self.__temp_rate_mambership['hot'], self.__fan_membership['fast']))
+                self.__temp_membership['normal'] & self.__temp_rate_mambership['hot'], self.__fan_membership['fast']))
 
             self.__rules.append(ctrl.Rule(
-                self.__temp_membership['hot'] | self.__temp_rate_mambership['cold'], self.__fan_membership['medium']))
+                self.__temp_membership['hot'] & self.__temp_rate_mambership['cold'], self.__fan_membership['medium']))
             self.__rules.append(ctrl.Rule(
-                self.__temp_membership['hot'] | self.__temp_rate_mambership['normal'], self.__fan_membership['fast']))
+                self.__temp_membership['hot'] & self.__temp_rate_mambership['normal'], self.__fan_membership['fast']))
             self.__rules.append(ctrl.Rule(
-                self.__temp_membership['hot'] | self.__temp_rate_mambership['hot'], self.__fan_membership['fast']))
+                self.__temp_membership['hot'] & self.__temp_rate_mambership['hot'], self.__fan_membership['fast']))
 
             return True
         except:
@@ -73,8 +75,8 @@ class TempFuzzyLogic:
 
 
     def set_input_values(self , temperature , temperature_rate):
-        self.temperature = temperature
-        self.temperature_rate = temperature_rate
+        self.temperature = self.__convert_to_fahrenheit(temperature)
+        self.temperature_rate = self.__convert_to_fahrenheit(temperature_rate)
     
     def defuzzification(self):
         try:
