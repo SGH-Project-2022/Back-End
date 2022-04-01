@@ -6,7 +6,7 @@ ID = 5
 
 def input_validation(value):
     
-    if float(value) >= 0 and float(value) <= 14:
+    if float(value) >= 0 and float(value) <= 20:
         return True
 
     api_response = ApiResponse()

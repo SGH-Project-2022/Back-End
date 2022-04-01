@@ -39,7 +39,7 @@ class GreenhouseDataModel:
         return self
                 
     def get_actuators_actions(self):
-        return  self.__actuators_actions
+        return self.__actuators_actions
     
     def get_automated_actions(self):
         return  self.__automated_actions

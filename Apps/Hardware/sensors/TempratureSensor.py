@@ -16,7 +16,7 @@ def input_validation(value):
         pass
     
     api_response = ApiResponse()
-    response = api_response.set_status_code(status.HTTP_404_NOT_FOUND).set_data("errors", "Invalid Sensor Value").get()
+    response = api_response.set_status_code(status.HTTP_404_NOT_FOUND).set_data("errors", "Invalid Temprature Sensor Value").get()
     raise serializers.ValidationError(detail=response)
     
     

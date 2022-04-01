@@ -10,7 +10,7 @@ from Apps.Hardware.validations import sensor_validation , actuator_validation
 from datetime import  datetime , timedelta
 # from FuzzyLogic.fuzzy_logic_system_settings import TIME_BETWEEN_FUZZY_ACTIONS
 
-TIME_BETWEEN_FUZZY_ACTIONS = timedelta(minutes=0)
+TIME_BETWEEN_FUZZY_ACTIONS = timedelta(minutes= 10)
 
 
 class SensorWithValueSerializer(serializers.Serializer):
@@ -60,11 +60,11 @@ class TakeActionSerializer(serializers.Serializer):
     def validate(self, data):
         greenhouse_validation(data["greenhouse_id"],data["password"])
         actuator_validation(data["actuator_id"])
-        self.actuator = Actuator.get_actuator(data["actuator_id"])
-        self.greenhouse = Greenhouse.get_greenhouse(data["greenhouse_id"],self.data["password"])
         return data
 
     def save(self,  **kwargs):
+        self.actuator = Actuator.get_actuator(self.data["actuator_id"])
+        self.greenhouse = Greenhouse.get_greenhouse(self.data["greenhouse_id"],self.data["password"])
         action = ActuatorsAction.objects.create(
             actuator=self.actuator,
             greenhouse=self.greenhouse,
@@ -74,49 +74,51 @@ class TakeActionSerializer(serializers.Serializer):
 
         return action
 
-class TakeAutomatedActionSerializer(serializers.Serializer):
+# class TakeAutomatedActionSerializer(serializers.Serializer):
 
-    greenhouse_id = serializers.IntegerField()
-    password = serializers.CharField()
-    actuator_id = serializers.IntegerField()
-    value = serializers.CharField()
-    duration = serializers.CharField(required=False, allow_null=True)
+#     greenhouse_id = serializers.IntegerField()
+#     password = serializers.CharField()
     
-    def check_date(self, action_date):
-        difference  = datetime.now() - datetime.strptime(str(action_date)[:19] , '%Y-%m-%d %H:%M:%S')
-        
-        if  difference < TIME_BETWEEN_FUZZY_ACTIONS:
-            return False
-        return True        
+#     # actuator_id = serializers.IntegerField()
+#     # value = serializers.CharField()
+#     # duration = serializers.CharField(required=False, allow_null=True)
     
-    def validate(self, data):
-        greenhouse_validation(data["greenhouse_id"],data["password"])
-        actuator_validation(data["actuator_id"])
-        is_allow_automated_control(data["greenhouse_id"],data["password"])
+#     def check_date(self, action_date):
+#         difference  = datetime.now() - datetime.strptime(str(action_date)[:19] , '%Y-%m-%d %H:%M:%S')
         
-        self.actuator = Actuator.get_actuator(data["actuator_id"])
-        self.greenhouse = Greenhouse.get_greenhouse(data["greenhouse_id"],data["password"])
-        last_action = ActuatorsAction.get_last_automated_actions(self.greenhouse , self.actuator)
+#         if  difference < TIME_BETWEEN_FUZZY_ACTIONS:
+#             return False
+#         return True        
+    
+#     def validate(self, data):
+#         greenhouse_validation(data["greenhouse_id"],data["password"])
+#         actuator_validation(data["actuator_id"])
+#         is_allow_automated_control(data["greenhouse_id"],data["password"])
+        
+#         # self.actuator = Actuator.get_actuator(data["actuator_id"])
+#         self.greenhouse = Greenhouse.get_greenhouse(data["greenhouse_id"],data["password"])
+#         last_action = ActuatorsAction.get_last_automated_actions(self.greenhouse , self.actuator)
 
         
-        if last_action:
-            if not self.check_date(last_action.created_at):    
-                api_response = ApiResponse()
-                response = api_response.set_status_code(status.HTTP_404_NOT_FOUND).set_data("errors", "Cannot apply automated control in the current date.").get()
-                raise serializers.ValidationError(detail=response)
+#         if last_action:
+#             if not self.check_date(last_action.created_at):    
+#                 print("********************* Cannot apply automated control in the current date. ****************************")
+#                 api_response = ApiResponse()
+#                 response = api_response.set_status_code(status.HTTP_404_NOT_FOUND).set_data("errors", "Cannot apply automated control in the current date.").get()
+#                 raise serializers.ValidationError(detail=response)
         
-        return data
+#         return data
 
-    def save(self,  **kwargs):
-        action = ActuatorsAction.objects.create(
-            actuator=self.actuator,
-            greenhouse=self.greenhouse,
-            value=self.data["value"],
-            duration=self.data["duration"],
-            is_automated_action = True
-        )
+#     def save(self,  **kwargs):
+#         action = ActuatorsAction.objects.create(
+#             actuator=self.actuator,
+#             greenhouse=self.greenhouse,
+#             value=self.data["value"],
+#             duration=self.data["duration"],
+#             is_automated_action = True
+#         )
 
-        return action
+#         return action
 
 # class GetSensorValuesSerializer(serializers.Serializer):
 #     greenhouse_id = serializers.IntegerField()
@@ -161,46 +163,39 @@ class TakeAutomatedActionSerializer(serializers.Serializer):
 
 
 
-# class GetActionsSerializer(serializers.Serializer):
+class GetActionsSerializer(serializers.Serializer):
 
-#     id = serializers.IntegerField()
-#     password = serializers.CharField(max_length=10)
+    id = serializers.IntegerField()
+    password = serializers.CharField(max_length=10)
 
-#     def validate(self, data):
-#         api_response = ApiResponse()
+    def validate(self, data):
+        api_response = ApiResponse()
 
-#         self.greenhouse = Greenhouse.get_greenhouse(id = data["id"], password=data["password"])
+        greenhouse_validation(id = data["id"], password=data["password"])
+        greenhouse_actuator_validation()
 
-#         if not self.greenhouse:
-#             response = api_response.set_status_code(status.HTTP_404_NOT_FOUND).set_data("errors", "A greenhouse with this ID and password is not found.").get()
-#             raise serializers.ValidationError(detail=response)
-
-#         self.greenhouse_actuators = GreenhouseActustor.get_greenhouse_actuators(self.greenhouse)
+        self.greenhouse_actuators = GreenhouseActustor.get_greenhouse_actuators(self.greenhouse)
         
-#         if not self.greenhouse_actuators:
-#             response = api_response.set_status_code(status.HTTP_404_NOT_FOUND).set_data("errors", "Undefind.").get()
-#             raise serializers.ValidationError(detail=response)
-        
-#         return data
+        return data
 
     
-#     def get_last_actions(self):
+    def get_last_actions(self):
 
-#         actions = []
+        actions = []
 
-#         for greenhouse_actuator in self.greenhouse_actuators:
-#             action = ActuatorsAction.get_last_actuator_actions(self.greenhouse,greenhouse_actuator.actuator)
-#             actions.append(ActuatorActionsSerializer(action ).data)
+        for greenhouse_actuator in self.greenhouse_actuators:
+            action = ActuatorsAction.get_last_actuator_actions(self.greenhouse,greenhouse_actuator.actuator)
+            actions.append(ActuatorActionsSerializer(action ).data)
 
-#         return actions
+        return actions
 
-#     def get_all_actions(self):
+    def get_all_actions(self):
 
-#         actions = []
+        actions = []
 
-#         for greenhouse_actuator in self.greenhouse_actuators:
-#             action = ActuatorsAction.get_all_actuator_actions(self.greenhouse,greenhouse_actuator.actuator)
-#             print(action)
-#             actions.append(ActuatorActionsSerializer(action , many=True).data)
+        for greenhouse_actuator in self.greenhouse_actuators:
+            action = ActuatorsAction.get_all_actuator_actions(self.greenhouse,greenhouse_actuator.actuator)
+            print(action)
+            actions.append(ActuatorActionsSerializer(action , many=True).data)
 
-#         return actions
+        return actions

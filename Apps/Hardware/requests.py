@@ -1,6 +1,6 @@
 from rest_framework import status
 from rest_framework.response import Response
-from .serializers.requests_serializers import TakeActionSerializer,  StoreSensorValuesSerializer , TakeAutomatedActionSerializer
+from .serializers.requests_serializers import TakeActionSerializer,  StoreSensorValuesSerializer  , GetActionsSerializer
 from .serializers.models_serializers import SensorSerializer, ActuatorSerializer,SensorValueSerializer,ActuatorActionsSerializer 
 from Apps.Greenhouses.greenhouse_data_model import GreenhouseDataModel
 from Library.api_response import ApiResponse
@@ -23,7 +23,7 @@ def store_sensors_values(data):
     api_response.set_status_code(status.HTTP_200_OK)
     api_response.set_data("sensor_values",SensorValueSerializer(sensor_values,many=True).data)
 
-    return api_response.response()
+    return api_response.get()
 
 
 def store_sensors_values_with_fuzzy(data):
@@ -46,28 +46,28 @@ def store_sensors_values_with_fuzzy(data):
     
     
     api_response.set_status_code(status.HTTP_200_OK)
-    api_response.set_data("sensor_values",SensorValueSerializer(sensor_values,many=True).data)
+    api_response.set_data("sensors",SensorValueSerializer(sensor_values,many=True).data)
 
-    return actions ,api_response.response()
+    return actions ,api_response.get()
 
 
 
-def take_automated_action(data):
+# def take_automated_action(data):
 
-    api_response.__init__()
+#     api_response.__init__()
 
-    serializer = TakeAutomatedActionSerializer(data = data)
+#     serializer = TakeAutomatedActionSerializer(data = data)
     
-    if not serializer.is_valid():
-        print(serializer.errors)
-        return Response(serializer.errors)
+#     if not serializer.is_valid():
+#         print(serializer.errors)
+#         return Response(serializer.errors)
     
-    action = serializer.save()
+#     action = serializer.save()
     
-    api_response.set_status_code(status.HTTP_200_OK)
-    api_response.set_data("action",ActuatorActionsSerializer(action).data)
+#     api_response.set_status_code(status.HTTP_200_OK)
+#     api_response.set_data("action",ActuatorActionsSerializer(action).data)
     
-    return api_response.response()
+#     return api_response.get()
 
 
 def take_action(data):
@@ -85,9 +85,24 @@ def take_action(data):
     api_response.set_status_code(status.HTTP_200_OK)
     api_response.set_data("action",ActuatorActionsSerializer(action).data)
 
+    return api_response.get()
+
+
+
+
+def get_last_action(self , request ):
+    api_response.__init__()
+
+    serializer = GetActionsSerializer(data=request.data)    
+    
+    if not serializer.is_valid():
+        return Response(serializer.errors)
+    
+    values = serializer.get_last_actions()
+    
+    api_response.set_status_code(status.HTTP_200_OK).set_data("data",values)
+
     return api_response.response()
-
-
 
 
 
@@ -145,23 +160,6 @@ def take_action(data):
 
 
 
-# class GetLastActionsView(APIView):
-    
-#     # permission_classes = [IsAuthenticated & HasGreenhouse  ]
-    
-#     def post(self , request ):
-#         api_response.__init__()
-    
-#         serializer = GetActionsSerializer(data=request.data)    
-        
-#         if not serializer.is_valid():
-#             return Response(serializer.errors)
-        
-#         values = serializer.get_last_actions()
-        
-#         api_response.set_status_code(status.HTTP_200_OK).set_data("data",values)
-
-#         return api_response.response()
 
 # class GetAllActionsView(APIView):
     

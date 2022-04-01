@@ -5,7 +5,7 @@ from Library.api_response import ApiResponse
 from rest_framework import status
 from SocketIO.socketio_server_settings import HARDWARE_NAMESPACE, WEB_NAMESPACE, MOBILE_NAMESPACE
 from Apps.Hardware.serializers.models_serializers import ActuatorActionsSerializer
-
+from FuzzyLogic.fuzzy_logic_system_imlementation import take_fuzzy_actions
 # ------------------------------------------------------ Hardware Client
 class HardwareNamespace(socketio.Namespace):
 
@@ -27,12 +27,20 @@ class HardwareNamespace(socketio.Namespace):
         print("Hardware Sent Sensor Values Successfully")
 
         actions , response = store_sensors_values_with_fuzzy(data)
-        if actions:
-            for action in actions:
-                api_response = ApiResponse()
-                api_response.set_status_code(status.HTTP_200_OK)
-                action_reponse = api_response.set_data("action",ActuatorActionsSerializer(action).data).get()
-                self.emit('take_action', action_reponse, namespace=HARDWARE_NAMESPACE,  room='myGreenhouse')
+        print(response)
+        print(actions)
+        # take_fuzzy_actions(self , actions)
+        
+        # if type(actions) == list:
+        #     for action in actions:
+        #         if action != False:    
+        #             api_response = ApiResponse()
+        #             api_response.set_status_code(status.HTTP_200_OK)
+        #             print(action)
+        #             action_reponse = api_response.set_data("action",ActuatorActionsSerializer(action).data).get()
+        #             self.emit('take_action', action_reponse, namespace=HARDWARE_NAMESPACE,  room='myGreenhouse')
+        #             self.emit('action_taked', action_reponse, namespace=MOBILE_NAMESPACE,  room='myGreenhouse')
+        #             self.emit('action_taked', action_reponse, namespace=WEB_NAMESPACE,  room='myGreenhouse')
             
         self.emit('sensors_values', response, namespace=WEB_NAMESPACE,  room='myGreenhouse')
         self.emit('sensors_values', response, namespace=MOBILE_NAMESPACE,  room='myGreenhouse')

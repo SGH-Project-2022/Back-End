@@ -6,7 +6,7 @@ from Apps.Hardware.serializers.models_serializers import  ActuatorActionsSeriali
 from Library.api_response import ApiResponse
 from rest_framework import status
 from SocketIO.socketio_server_settings import HARDWARE_NAMESPACE, WEB_NAMESPACE, MOBILE_NAMESPACE
-
+from Apps.Hardware.requests import take_action
 
 
 #------------------------------------------------------ Frontend Client
@@ -21,24 +21,14 @@ class WebNamespace(socketio.Namespace):
         
     def on_take_action(self,sid,data):
         
-        serializer = TakeActionSerializer(data = data)
-        if not serializer.is_valid():
-            api_response = ApiResponse()
-            errors_response = api_response.set_status_code(status.HTTP_400_BAD_REQUEST).set_data("errors" , serializer.errors).get()
-            self.emit('take_action_status' , errors_response ,room="myGreenhouse",namespace=WEB_NAMESPACE)
-        else:
-            
-            api_response = ApiResponse()
-            action = serializer.save()
-            api_response.set_status_code(status.HTTP_200_OK)
-            api_response.set_data("action",ActuatorActionsSerializer(action).data)
-            
 
-            response = api_response.set_status_code(200).get()
-            print(response)
-            
-            self.emit('take_action', response  ,room='myGreenhouse', namespace=HARDWARE_NAMESPACE)
-            self.emit('action_taked', response  ,room='myGreenhouse', namespace=MOBILE_NAMESPACE)
+        response = take_action(data)
+        
+        self.emit('take_action', response  ,room='myGreenhouse', namespace=HARDWARE_NAMESPACE)
+
+
+        self.emit('action_taked', response, namespace=WEB_NAMESPACE,  room='myGreenhouse')        
+        self.emit('action_taked', response  ,room='myGreenhouse', namespace=MOBILE_NAMESPACE)
 
     
     def on_disconnect(self, sid):

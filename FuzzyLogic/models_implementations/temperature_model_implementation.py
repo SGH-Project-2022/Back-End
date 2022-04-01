@@ -3,7 +3,7 @@ from rest_framework import serializers
 from Apps.Greenhouses.greenhouse_data_model import GreenhouseDataModel
 from Apps.Hardware.sensors import TempratureSensor
 from Apps.Hardware.actuators import FanActuator
-from Apps.Hardware.serializers.requests_serializers import TakeAutomatedActionSerializer
+# from Apps.Hardware.serializers.requests_serializers import TakeAutomatedActionSerializer
 from Apps.Hardware.models import SensorValues
 class TemperatureModelImplementation:
     def __init__(self) -> None:
@@ -46,9 +46,9 @@ class TemperatureModelImplementation:
             "value":value,
             "duration":duration,
         }
-        serializer = TakeAutomatedActionSerializer(data = json)
-        serializer.is_valid(raise_exception=True)
-        return serializer.save()
+        # serializer = TakeAutomatedActionSerializer(data = json)
+        # serializer.is_valid(raise_exception=True)
+        # return serializer.save()
     
     
 
